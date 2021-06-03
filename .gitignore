@@ -1,0 +1,8 @@
+*~
+*.swp
+zig-cache/
+answers/
+patches/healed/
+
+.direnv/*
+!.direnv/.git-keep

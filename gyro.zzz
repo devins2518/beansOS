@@ -1,0 +1,10 @@
+pkgs:
+  rtos:
+    version: 0.0.1
+    description: "An embedded RTOS in Zig"
+    license: MIT
+    source_url: "https://github.com/devins2518/rtos"
+
+    root: src/main.zig
+    files:
+      README.md
