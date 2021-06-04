@@ -1,27 +1,45 @@
-const Builder = @import("std").build.Builder;
+const Builder = std.build.Builder;
+const builtin = @import("builtin");
+const std = @import("std");
+const target = std.Target;
 
 pub fn build(b: *Builder) void {
-    // Standard target options allows the person running `zig build` to choose
-    // what target to build for. Here we do not override the defaults, which
-    // means any target is allowed, and the default is native. Other options
-    // for restricting supported target set are available.
-    const target = b.standardTargetOptions(.{});
+    // Use eabihf for freestanding arm code with hardware float support
+    const buildTarget = std.zig.CrossTarget{
+        .cpu_arch = target.Cpu.Arch.arm,
+        .cpu_model = .{ .explicit = &std.Target.arm.cpu.cortex_m4 },
+        .os_tag = target.Os.Tag.freestanding,
+        .abi = target.Abi.eabihf,
+    };
 
-    // Standard release options allow the person running `zig build` to select
-    // between Debug, ReleaseSafe, ReleaseFast, and ReleaseSmall.
     const mode = b.standardReleaseOptions();
-
-    const exe = b.addExecutable("rtos", "src/main.zig");
-    exe.setTarget(target);
+    const exe = b.addExecutable("beansOS.elf", "src/main.zig");
     exe.setBuildMode(mode);
-    exe.install();
+    exe.setTarget(buildTarget);
+    exe.setBuildMode(mode);
 
-    const run_cmd = exe.run();
-    run_cmd.step.dependOn(b.getInstallStep());
-    if (b.args) |args| {
-        run_cmd.addArgs(args);
-    }
+    //const vector = b.addObject("vector", "src/vectors.zig");
+    //vector.setTarget(buildTarget);
+    //vector.setBuildMode(mode);
+    //exe.addObject(vector);
 
-    const run_step = b.step("run", "Run the app");
-    run_step.dependOn(&run_cmd.step);
+    // TODO: Make different linker scripts for different boards?
+    exe.setLinkerScriptPath("./linker.ld");
+
+    const bin = b.addInstallRaw(exe, "beansOS.bin");
+    const bin_step = b.step("bin", "Generate binary file to be flashed");
+    bin_step.dependOn(&bin.step);
+
+    const flash_cmd = b.addSystemCommand(&[_][]const u8{
+        "st-flash",
+        "write",
+        b.getInstallPath(bin.dest_dir, bin.dest_filename),
+        "0x8000000",
+    });
+    flash_cmd.step.dependOn(&bin.step);
+    const flash_step = b.step("flash", "Flash onto your STM32 board");
+    flash_step.dependOn(&flash_cmd.step);
+
+    b.default_step.dependOn(&exe.step);
+    b.installArtifact(exe);
 }
