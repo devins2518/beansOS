@@ -24,7 +24,7 @@ pub fn build(b: *Builder) void {
     //exe.addObject(vector);
 
     // TODO: Make different linker scripts for different boards?
-    exe.setLinkerScriptPath("./linker.ld");
+    exe.setLinkerScriptPath("linkers/f303re.ld");
 
     const bin = b.addInstallRaw(exe, "beansOS.bin");
     const bin_step = b.step("bin", "Generate binary file to be flashed");
