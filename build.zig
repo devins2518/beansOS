@@ -4,7 +4,7 @@ const std = @import("std");
 const target = std.Target;
 
 pub fn build(b: *Builder) void {
-    // Use eabihf for freestanding arm code with hardware float support
+    // Use eabihf for freestanding thumb code with hardware float support
     const buildTarget = std.zig.CrossTarget{
         .cpu_arch = target.Cpu.Arch.thumb,
         .cpu_model = .{ .explicit = &std.Target.arm.cpu.cortex_m4 },
