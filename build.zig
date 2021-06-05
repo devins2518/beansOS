@@ -18,10 +18,10 @@ pub fn build(b: *Builder) void {
     exe.setTarget(buildTarget);
     exe.setBuildMode(mode);
 
-    //const vector = b.addObject("vector", "src/vectors.zig");
-    //vector.setTarget(buildTarget);
-    //vector.setBuildMode(mode);
-    //exe.addObject(vector);
+    const vector = b.addObject("vector", "src/vectors.zig");
+    vector.setTarget(buildTarget);
+    vector.setBuildMode(mode);
+    exe.addObject(vector);
 
     // TODO: Make different linker scripts for different boards?
     exe.setLinkerScriptPath("linkers/f303re.ld");
