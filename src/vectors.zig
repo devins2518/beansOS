@@ -11,8 +11,14 @@
 // copies or substantial portions of the Software.
 
 // These two are the default empty implementations for exception handlers
+const main = @import("main.zig").main;
+
 export fn blockingHandler() void {
     while (true) {}
+}
+
+export fn Reset_Handler() void {
+    main();
 }
 
 export fn nullHandler() void {}
